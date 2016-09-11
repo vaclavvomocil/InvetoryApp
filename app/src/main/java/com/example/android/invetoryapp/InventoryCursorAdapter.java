@@ -2,13 +2,18 @@ package com.example.android.invetoryapp;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.invetoryapp.data.InventoryContract.InventoryEntry;
+
+import java.sql.Blob;
 
 
 public class InventoryCursorAdapter extends CursorAdapter {
@@ -48,18 +53,25 @@ public class InventoryCursorAdapter extends CursorAdapter {
         // Find individual views that we want to modify in the list item layout
         TextView nameTextView = (TextView) view.findViewById(R.id.name);
         TextView summaryTextView = (TextView) view.findViewById(R.id.summary);
+        ImageView imageImageView = (ImageView) view.findViewById(R.id.image);
 
         // Find the columns of pet attributes that we're interested in
         int nameColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_PRODUCT_NAME);
         int priceColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_PRICE);
+        int imageColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_IMAGE);
 
         // Read the pet attributes from the Cursor for the current pet
         String inventoryName = cursor.getString(nameColumnIndex);
         String inventoryPrice = cursor.getString(priceColumnIndex);
+        byte[] inventoryImage = cursor.getBlob(imageColumnIndex);
+
+        Bitmap inventoryImageBitmap = DbBitmapUtility.getImage(inventoryImage);
+
 
         // Update the TextViews with the attributes for the current pet
         nameTextView.setText(inventoryName);
         summaryTextView.setText(inventoryPrice);
+        imageImageView.setImageBitmap(inventoryImageBitmap);
     }
 
 }

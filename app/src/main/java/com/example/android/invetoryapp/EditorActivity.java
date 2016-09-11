@@ -1,5 +1,6 @@
 package com.example.android.invetoryapp;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentValues;
@@ -7,23 +8,38 @@ import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.invetoryapp.data.InventoryContract.InventoryEntry;
+
+import java.io.InputStream;
 
 public class EditorActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
@@ -46,6 +62,11 @@ public class EditorActivity extends AppCompatActivity implements
     /** EditText field to enter the pet's gender */
     private EditText mQuantityEditText;
 
+    private TextView mImageName;
+    private ImageView mImageView;
+    private static final int SELECT_IMAGE = 100;
+    private Bitmap selectedBitmap = null;
+    private int REQUEST_PERMISSION = 1;
 
 
     /** Boolean flag that keeps track of whether the pet has been edited (true) or not (false) */
@@ -96,6 +117,7 @@ public class EditorActivity extends AppCompatActivity implements
         mPriceEditText = (EditText) findViewById(R.id.edit_inventory_price);
         mQuantityEditText = (EditText) findViewById(R.id.edit_inventory_quantity);
         mSaleEditText = (EditText) findViewById(R.id.edit_inventory_sale);
+        mImageView = (ImageView) findViewById(R.id.edit_inventory_image);
 
         // Setup OnTouchListeners on all the input fields, so we can determine if the user
         // has touched or modified them. This will let us know if there are unsaved changes
@@ -104,6 +126,22 @@ public class EditorActivity extends AppCompatActivity implements
         mPriceEditText.setOnTouchListener(mTouchListener);
         mQuantityEditText.setOnTouchListener(mTouchListener);
         mSaleEditText.setOnTouchListener(mTouchListener);
+
+        Button pick_image = (Button) findViewById(R.id.pick_image);
+        pick_image.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent imagePickerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                startActivityForResult(imagePickerIntent, SELECT_IMAGE);
+            }
+        });
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    REQUEST_PERMISSION);
+      //      dialog.dismiss();
+            return;
+        }
     }
 
     /**
@@ -116,7 +154,8 @@ public class EditorActivity extends AppCompatActivity implements
         String priceString = mPriceEditText.getText().toString().trim();
         String quantityString = mQuantityEditText.getText().toString().trim();
         String saleString = mSaleEditText.getText().toString().trim();
-
+        Bitmap image=((BitmapDrawable)mImageView.getDrawable()).getBitmap();
+        
         // Check if this is supposed to be a new pet
         // and check if all the fields in the editor are blank
         if (mCurrentInventoryUri == null &&
@@ -134,6 +173,7 @@ public class EditorActivity extends AppCompatActivity implements
         values.put(InventoryEntry.COLUMN_PRICE, priceString);
         values.put(InventoryEntry.COLUMN_CURRENT_QUANTITY, quantityString);
         values.put(InventoryEntry.COLUMN_SALE, saleString);
+        values.put(InventoryEntry.COLUMN_IMAGE, DbBitmapUtility.getBytes(image));
 
         // Determine if this is a new or existing pet by checking if mCurrentPetUri is null or not
         if (mCurrentInventoryUri == null) {
@@ -276,7 +316,8 @@ public class EditorActivity extends AppCompatActivity implements
                 InventoryEntry.COLUMN_PRODUCT_NAME,
                 InventoryEntry.COLUMN_PRICE,
                 InventoryEntry.COLUMN_CURRENT_QUANTITY,
-                InventoryEntry.COLUMN_SALE };
+                InventoryEntry.COLUMN_SALE,
+                InventoryEntry.COLUMN_IMAGE};
 
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,   // Parent activity context
@@ -302,18 +343,22 @@ public class EditorActivity extends AppCompatActivity implements
             int priceColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_PRICE);
             int quantityColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_CURRENT_QUANTITY);
             int saleColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_SALE);
+            int imageColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_IMAGE);
 
             // Extract out the value from the Cursor for the given column index
             String name = cursor.getString(nameColumnIndex);
             int price = cursor.getInt(priceColumnIndex);
             int quantity = cursor.getInt(quantityColumnIndex);
             int sale = cursor.getInt(saleColumnIndex);
+            byte[] inventoryImage = cursor.getBlob(imageColumnIndex);
+            Bitmap inventoryImageBitmap = DbBitmapUtility.getImage(inventoryImage);
 
             // Update the views on the screen with the values from the database
             mNameEditText.setText(name);
             mPriceEditText.setText(Integer.toString(price));
             mQuantityEditText.setText(Integer.toString(quantity));
             mSaleEditText.setText(Integer.toString(sale));
+            mImageView.setImageBitmap(inventoryImageBitmap);
         }
     }
 
@@ -324,6 +369,7 @@ public class EditorActivity extends AppCompatActivity implements
         mPriceEditText.setText("");
         mQuantityEditText.setText("");
         mSaleEditText.setText("");
+        mImageView.setImageBitmap(null);
     }
 
     /**
@@ -421,6 +467,37 @@ public class EditorActivity extends AppCompatActivity implements
         intent.putExtra(Intent.EXTRA_SUBJECT, "new order: " + nameString);
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+
+        switch(requestCode) {
+            case SELECT_IMAGE:
+                if(resultCode == RESULT_OK){
+                    Uri selectedImage = imageReturnedIntent.getData();
+                    try {
+                        selectedBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+                    } catch (java.io.IOException e) {
+                        Log.v("EditorActivity", "get bitmap failed");
+                    }
+                    mImageView.setImageBitmap(selectedBitmap);
+
+                }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted.
+            } else {
+                // User refused to grant permission.
+            }
         }
     }
 }

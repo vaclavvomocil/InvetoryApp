@@ -28,7 +28,7 @@ public class InventoryContract {
         public final static String COLUMN_PRICE = "price";
         public final static String COLUMN_SALE = "sale";
         public final static String COLUMN_IMAGE = "image";
-
+        public final static String COLUMN_IMAGE_NAME = "image_name";
     }
 
 }

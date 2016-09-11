@@ -31,10 +31,11 @@
     <string name="category_overview">Overview</string>
     <string name="category_price">Price</string>
     <string name="category_quantity">Quantity</string>
-
+    <string name="picture">Picture:</string>
     <string name="name">Name:</string>
     <string name="price">Price:</string>
     <string name="quantity">Quantity:</string>
     <string name="sale">Sale:</string>
+    <string name="pick_image">pick image</string>
 
 </resources>

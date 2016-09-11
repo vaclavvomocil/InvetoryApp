@@ -7,6 +7,8 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -93,6 +95,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         values.put(InventoryEntry.COLUMN_PRICE, 50);
         values.put(InventoryEntry.COLUMN_SALE, 4);
 
+
+        Bitmap tv = BitmapFactory.decodeResource(getResources(), R.drawable.tv);
+        values.put(InventoryEntry.COLUMN_IMAGE, DbBitmapUtility.getBytes(tv));
+
         // Insert a new row for Toto into the provider using the ContentResolver.
         // Use the {@link PetEntry#CONTENT_URI} to indicate that we want to insert
         // into the pets database table.
@@ -135,7 +141,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         String[] projection = {
                 InventoryEntry._ID,
                 InventoryEntry.COLUMN_PRODUCT_NAME,
-                InventoryEntry.COLUMN_PRICE };
+                InventoryEntry.COLUMN_PRICE,
+                InventoryEntry.COLUMN_IMAGE
+        };
 
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,   // Parent activity context
