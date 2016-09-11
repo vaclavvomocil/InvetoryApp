@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".EditorActivity">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+        <TextView
+            android:text="@string/overview"
+            style="@style/InventoryStyle" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/name"
+                style="@style/InventoryTextViewStyle"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/price"
+                style="@style/InventoryTextViewStyle"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/quantity"
+                android:paddingTop="20dp"
+                style="@style/InventoryTextViewStyle"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sale"
+                android:paddingTop="20dp"
+                style="@style/InventoryTextViewStyle"/>
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:paddingLeft="4dp"
+            android:orientation="vertical">
+
+
+            <EditText
+                android:id="@+id/edit_inventory_name"
+                android:inputType="textCapWords"
+                android:hint="@string/hint_name"
+                style="@style/InventoryEditorStyle" />
+
+
+            <EditText
+                android:id="@+id/edit_inventory_price"
+                android:inputType="number"
+                android:hint="@string/hint_price"
+                style="@style/InventoryEditorStyle" />
+
+
+            <EditText
+                android:id="@+id/edit_inventory_quantity"
+                android:hint="@string/hint_quantity"
+                android:inputType="numberDecimal"
+                style="@style/InventoryEditorStyle" />
+
+
+            <EditText
+                android:id="@+id/edit_inventory_sale"
+                android:hint="@string/hint_sale"
+                android:inputType="numberDecimal"
+                style="@style/InventoryEditorStyle" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+</LinearLayout>
