@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -89,6 +90,9 @@ public class EditorActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.inventory_editor);
 
+        final Context context = getApplicationContext();
+        Toast toast;
+
         // Examine the intent that was used to launch this activity,
         // in order to figure out if we're creating a new pet or editing an existing one.
         Intent intent = getIntent();
@@ -142,6 +146,55 @@ public class EditorActivity extends AppCompatActivity implements
       //      dialog.dismiss();
             return;
         }
+        Button receivedButton = (Button) findViewById(R.id.received);
+        receivedButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                EditText quantity = (EditText) findViewById(R.id.edit_inventory_quantity);
+                String quantityString = quantity.getText().toString();
+                if (quantityString.trim().length() == 0 ) {
+                    quantity.setText("1");
+                } else {
+                    //  Log.v("edit", quantityValue+"");
+                    int quantityValue = Integer.parseInt(quantityString);
+                    quantity.setText(String.valueOf(++quantityValue));
+                }
+            }
+        });
+        Button soldButton = (Button) findViewById(R.id.sold);
+        soldButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Toast toast;
+                EditText quantity = (EditText) findViewById(R.id.edit_inventory_quantity);
+                EditText sold = (EditText) findViewById(R.id.edit_inventory_sale);
+                String quantityString = quantity.getText().toString();
+                String soldString = sold.getText().toString();
+                if (quantityString.trim().length() == 0 ) {
+                    toast = Toast.makeText(context, "set quantity first", Toast.LENGTH_SHORT);
+                    toast.show();
+                } else if (soldString.trim().length() != 0) {
+                    //  Log.v("edit", quantityValue+"");
+                    int quantityValue = Integer.parseInt(quantityString);
+                    int soldValue = Integer.parseInt(soldString);
+                    if (quantityValue > 0) {
+                        quantity.setText(String.valueOf(--quantityValue));
+                        sold.setText(String.valueOf(++soldValue));
+                    } else {
+                        toast = Toast.makeText(context, "quantity has to be bigger than 0", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                } else if (soldString.trim().length() == 0) {
+                    int quantityValue = Integer.parseInt(quantityString);
+                    if (quantityValue > 0) {
+                        quantity.setText(String.valueOf(--quantityValue));
+                        sold.setText(String.valueOf("1"));
+                    } else {
+                        toast = Toast.makeText(context, "quantity has to be bigger than 0", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+
+                }
+            }
+        });
     }
 
     /**

@@ -107,13 +107,21 @@
                     android:text="@string/quantity" />
 
                 <EditText
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/edit_inventory_quantity"
                     android:hint="@string/hint_quantity"
                     android:inputType="numberDecimal"
-                    android:gravity="right"
+                    android:gravity="right" />
+
+                <Button
+                    android:id="@+id/received"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/received"
                     android:paddingRight="16dp"/>
+
+
             </LinearLayout>
 
             <LinearLayout
@@ -127,13 +135,21 @@
                     android:layout_height="wrap_content"
                     android:text="@string/sale" />
 
+
                 <EditText
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/edit_inventory_sale"
                     android:hint="@string/hint_sale"
                     android:inputType="numberDecimal"
                     android:gravity="right"
+                    />
+
+                <Button
+                    android:id="@+id/sold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sold"
                     android:paddingRight="16dp"/>
 
             </LinearLayout>
