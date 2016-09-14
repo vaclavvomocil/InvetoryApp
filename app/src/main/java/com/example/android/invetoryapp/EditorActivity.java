@@ -169,11 +169,24 @@ public class EditorActivity extends AppCompatActivity implements
         String priceString = mPriceEditText.getText().toString().trim();
         String quantityString = mQuantityEditText.getText().toString().trim();
         String saleString = mSaleEditText.getText().toString().trim();
-        Bitmap image=((BitmapDrawable)mImageView.getDrawable()).getBitmap();
+        Bitmap image = null;
+        try {
+            image = ((BitmapDrawable) mImageView.getDrawable()).getBitmap();
+        }
+        catch (Exception e)
+        {
+            Toast.makeText(this, "please set picture", Toast.LENGTH_SHORT).show();
+        }
+
+        if (TextUtils.isEmpty(nameString) || TextUtils.isEmpty(priceString) ||
+                TextUtils.isEmpty(quantityString) || TextUtils.isEmpty(saleString) || (image == null) ) {
+            Toast.makeText(this, "all variables has to be filled in before you can save", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if (mCurrentInventoryUri == null &&
                 TextUtils.isEmpty(nameString) && TextUtils.isEmpty(priceString) &&
-                TextUtils.isEmpty(quantityString) && TextUtils.isEmpty(saleString)) {
+                TextUtils.isEmpty(quantityString) && TextUtils.isEmpty(saleString) && (image == null) ) {
             return;
         }
 

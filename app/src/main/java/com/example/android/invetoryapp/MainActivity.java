@@ -109,7 +109,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 InventoryEntry._ID,
                 InventoryEntry.COLUMN_PRODUCT_NAME,
                 InventoryEntry.COLUMN_PRICE,
-                InventoryEntry.COLUMN_IMAGE
+                InventoryEntry.COLUMN_IMAGE,
+                InventoryEntry.COLUMN_CURRENT_QUANTITY,
+                InventoryEntry.COLUMN_SALE
         };
 
 
