@@ -1,38 +1,27 @@
+
 package com.example.android.invetoryapp;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.provider.ContactsContract;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CursorAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.android.invetoryapp.data.InventoryContract.InventoryEntry;
-
-import java.sql.Blob;
-import java.util.zip.Inflater;
-
+import com.example.android.invetoryapp.data.InventoryContract;
+import com.example.android.invetoryapp.data.InventoryContract.InventoryEntry;;
 
 public class InventoryCursorAdapter extends CursorAdapter {
 
-    private String inventoryQuantity;
-    private String inventorySale;
-    private TextView saleTextView;
-    private TextView quantityTextView;
-    private Cursor cursor;
-    private Context context;
-    Toast toast;
-
-    public InventoryCursorAdapter(Context context, Cursor c) {
-        super(context, c, 0 /* flags */);
+    public InventoryCursorAdapter(Context context, Cursor cursor) {
+        super(context, cursor);
     }
 
     @Override
@@ -41,57 +30,66 @@ public class InventoryCursorAdapter extends CursorAdapter {
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(final View view, final Context context, final Cursor cursor) {
         TextView nameTextView = (TextView) view.findViewById(R.id.name);
         TextView summaryTextView = (TextView) view.findViewById(R.id.price);
         ImageView imageImageView = (ImageView) view.findViewById(R.id.image);
-        quantityTextView = (TextView) view.findViewById(R.id.quantity);
-        saleTextView = (TextView) view.findViewById(R.id.sale);
+        TextView quantityTextView = (TextView) view.findViewById(R.id.quantity);
+        TextView saleTextView = (TextView) view.findViewById(R.id.sale);
+        final Button button = (Button) view.findViewById(R.id.saleList);
 
         int nameColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_PRODUCT_NAME);
+        Log.v("nameColumnIndex", nameColumnIndex + "");
         int priceColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_PRICE);
         int imageColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_IMAGE);
         int quantityColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_CURRENT_QUANTITY);
         int saleColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_SALE);
+        int idColumnIndex = cursor.getColumnIndex(InventoryEntry._ID);
+        Log.v("idColumnIndex", idColumnIndex + "");
+
 
         String inventoryName = cursor.getString(nameColumnIndex);
+        Log.v("inventoryName", inventoryName + "");
         String inventoryPrice = cursor.getString(priceColumnIndex);
         byte[] inventoryImage = cursor.getBlob(imageColumnIndex);
-        inventoryQuantity = cursor.getString(quantityColumnIndex);
-        inventorySale = cursor.getString(saleColumnIndex);
+        String inventoryQuantity = cursor.getString(quantityColumnIndex);
+        String inventorySale = cursor.getString(saleColumnIndex);
+        String inventoryId = cursor.getString(idColumnIndex);
+        Log.v("inventoryId", inventoryId + "");
 
         Bitmap inventoryImageBitmap = DbBitmapUtility.getImage(inventoryImage);
 
-        nameTextView.setText("name: " +inventoryName);
+        nameTextView.setText("name: " + inventoryName);
         summaryTextView.setText("price: " + inventoryPrice);
         imageImageView.setImageBitmap(inventoryImageBitmap);
         quantityTextView.setText("quantity: " + inventoryQuantity);
         saleTextView.setText("sale: " + inventorySale);
 
-    }
-
-    @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        final View inflatedView = super.getView(position, convertView, parent);
-
-        inflatedView.findViewById(R.id.saleList).setOnClickListener(new View.OnClickListener() {
+        button.setTag(inventoryId);
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TextView quantityTextView = (TextView) inflatedView.findViewById(R.id.quantity);
+                TextView quantityTextView = (TextView) view.findViewById(R.id.quantity);
                 String[] quantity = quantityTextView.getText().toString().split(" ", 2);
-                TextView saleTextView = (TextView) inflatedView.findViewById(R.id.sale);
+                TextView saleTextView = (TextView) view.findViewById(R.id.sale);
                 String[] sale = saleTextView.getText().toString().split(" ", 2);
 
                 int quantityValue = Integer.parseInt(quantity[1]);
-                int saleValue =  Integer.parseInt(sale[1]);
-                if (quantityValue > 0 ) {
-                    saleTextView.setText("sale: " + ++saleValue);
-                    quantityTextView.setText("quantity: " + --quantityValue);
+                int saleValue = Integer.parseInt(sale[1]);
+                if (quantityValue > 0) {
+                    saleTextView.setText("sale: " + +saleValue);
+                    quantityTextView.setText("quantity: " + -quantityValue);
+                    String row = (String) button.getTag();
+
+                    Uri mCurrentInventoryUri = Uri.withAppendedPath(InventoryContract.BASE_CONTENT_URI, InventoryContract.PATH_INVENTORY);
+                    ContentValues values = new ContentValues();
+                    values.put(InventoryEntry.COLUMN_CURRENT_QUANTITY, --quantityValue);
+                    values.put(InventoryEntry.COLUMN_SALE, ++saleValue);
+                    int rowsAffected = context.getContentResolver().update(mCurrentInventoryUri, values, "_id=" + row, null);
                 }
             }
         });
-        return inflatedView;
-    }
 
+    }
 
 }

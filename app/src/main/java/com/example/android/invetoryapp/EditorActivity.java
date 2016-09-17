@@ -83,7 +83,6 @@ public class EditorActivity extends AppCompatActivity implements
 
         if (mCurrentInventoryUri == null) {
             setTitle(getString(R.string.editor_activity_title_new_inventory));
-
             invalidateOptionsMenu();
         } else {
             setTitle(getString(R.string.editor_activity_title_edit_inventory));
@@ -208,6 +207,7 @@ public class EditorActivity extends AppCompatActivity implements
                         Toast.LENGTH_SHORT).show();
             }
         } else {
+            Log.v("current uri", ""+mCurrentInventoryUri);
             int rowsAffected = getContentResolver().update(mCurrentInventoryUri, values, null, null);
 
             if (rowsAffected == 0) {
