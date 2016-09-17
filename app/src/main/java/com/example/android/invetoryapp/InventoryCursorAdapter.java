@@ -77,14 +77,16 @@ public class InventoryCursorAdapter extends CursorAdapter {
                 int quantityValue = Integer.parseInt(quantity[1]);
                 int saleValue = Integer.parseInt(sale[1]);
                 if (quantityValue > 0) {
-                    saleTextView.setText("sale: " + +saleValue);
-                    quantityTextView.setText("quantity: " + -quantityValue);
+                    int updatedSale = ++saleValue;
+                    int updatedQuantity = --quantityValue;
+                    saleTextView.setText("sale: " + updatedSale);
+                    quantityTextView.setText("quantity: " + updatedQuantity);
                     String row = (String) button.getTag();
 
                     Uri mCurrentInventoryUri = Uri.withAppendedPath(InventoryContract.BASE_CONTENT_URI, InventoryContract.PATH_INVENTORY);
                     ContentValues values = new ContentValues();
-                    values.put(InventoryEntry.COLUMN_CURRENT_QUANTITY, --quantityValue);
-                    values.put(InventoryEntry.COLUMN_SALE, ++saleValue);
+                    values.put(InventoryEntry.COLUMN_CURRENT_QUANTITY, updatedQuantity);
+                    values.put(InventoryEntry.COLUMN_SALE, updatedSale);
                     int rowsAffected = context.getContentResolver().update(mCurrentInventoryUri, values, "_id=" + row, null);
                 }
             }
